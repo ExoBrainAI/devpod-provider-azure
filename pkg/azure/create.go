@@ -169,10 +169,13 @@ func createPublicIP(
 	parameters := armnetwork.PublicIPAddress{
 		Location: to.Ptr(azureProvider.Config.Zone),
 		Tags:     azureProvider.Config.Tags,
+		SKU: &armnetwork.PublicIPAddressSKU{
+			Name: to.Ptr(armnetwork.PublicIPAddressSKUNameStandard),
+		},
 		Properties: &armnetwork.PublicIPAddressPropertiesFormat{
 			PublicIPAllocationMethod: to.Ptr(
 				armnetwork.IPAllocationMethodStatic,
-			), // Static or Dynamic
+			), // Standard SKU requires Static allocation.
 		},
 	}
 
