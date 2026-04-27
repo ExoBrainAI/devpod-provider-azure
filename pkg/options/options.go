@@ -11,29 +11,31 @@ import (
 )
 
 var (
-	AZURE_REGION          = "AZURE_REGION"
-	AZURE_INSTANCE_SIZE   = "AZURE_INSTANCE_SIZE"
-	AZURE_IMAGE           = "AZURE_IMAGE"
-	AZURE_RESOURCE_GROUP  = "AZURE_RESOURCE_GROUP"
-	AZURE_DISK_TYPE       = "AZURE_DISK_TYPE"
-	AZURE_DISK_SIZE       = "AZURE_DISK_SIZE"
-	AZURE_CUSTOM_DATA     = "AZURE_CUSTOM_DATA"
-	AZURE_SUBSCRIPTION_ID = "AZURE_SUBSCRIPTION_ID"
-	AZURE_TAGS            = "AZURE_TAGS"
+	AZURE_REGION                    = "AZURE_REGION"
+	AZURE_INSTANCE_SIZE             = "AZURE_INSTANCE_SIZE"
+	AZURE_IMAGE                     = "AZURE_IMAGE"
+	AZURE_RESOURCE_GROUP            = "AZURE_RESOURCE_GROUP"
+	AZURE_DISK_TYPE                 = "AZURE_DISK_TYPE"
+	AZURE_DISK_SIZE                 = "AZURE_DISK_SIZE"
+	AZURE_CUSTOM_DATA               = "AZURE_CUSTOM_DATA"
+	AZURE_SUBSCRIPTION_ID           = "AZURE_SUBSCRIPTION_ID"
+	AZURE_TAGS                      = "AZURE_TAGS"
+	AZURE_SYSTEM_ASSIGNED_IDENTITY  = "AZURE_SYSTEM_ASSIGNED_IDENTITY"
 )
 
 type Options struct {
-	DiskImage      AzureImage
-	DiskSizeGB     int
-	DiskType       string
-	CustomData     string
-	MachineFolder  string
-	MachineID      string
-	MachineType    string
-	ResourceGroup  string
-	SubscriptionID string
-	Zone           string
-	Tags           map[string]*string
+	DiskImage              AzureImage
+	DiskSizeGB             int
+	DiskType               string
+	CustomData             string
+	MachineFolder          string
+	MachineID              string
+	MachineType            string
+	ResourceGroup          string
+	SubscriptionID         string
+	Zone                   string
+	Tags                   map[string]*string
+	SystemAssignedIdentity bool
 }
 
 type AzureImage struct {
@@ -104,6 +106,16 @@ func FromEnv(init bool) (*Options, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Optional. Defaults to false (no managed identity attached) to preserve
+	// existing behaviour. When true, the VM is created with a system-assigned
+	// managed identity, enabling use cases like in-VM access to Key Vault
+	// without operator-side credential handling. Role assignments against
+	// specific resources remain the operator's responsibility.
+	retOptions.SystemAssignedIdentity = strings.EqualFold(
+		os.Getenv(AZURE_SYSTEM_ASSIGNED_IDENTITY),
+		"true",
+	)
 
 	// Return eraly if we're just doing init
 	if init {

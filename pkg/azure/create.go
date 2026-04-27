@@ -293,11 +293,16 @@ func createVirtualMachine(
 
 	}
 
+	identityType := armcompute.ResourceIdentityTypeNone
+	if azureProvider.Config.SystemAssignedIdentity {
+		identityType = armcompute.ResourceIdentityTypeSystemAssigned
+	}
+
 	parameters := armcompute.VirtualMachine{
 		Location: to.Ptr(azureProvider.Config.Zone),
 		Tags:     azureProvider.Config.Tags,
 		Identity: &armcompute.VirtualMachineIdentity{
-			Type: to.Ptr(armcompute.ResourceIdentityTypeNone),
+			Type: to.Ptr(identityType),
 		},
 		Properties: &armcompute.VirtualMachineProperties{
 			StorageProfile: &armcompute.StorageProfile{
