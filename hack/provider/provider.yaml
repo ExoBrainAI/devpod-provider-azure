@@ -20,6 +20,7 @@ optionGroups:
     defaultVisible: false
   - options:
       - AZURE_CUSTOM_DATA
+      - AZURE_SYSTEM_ASSIGNED_IDENTITY
     name: "Advanced options"
     defaultVisible: false
 options:
@@ -142,6 +143,15 @@ options:
   AZURE_TAGS:
     description: Extra tags to apply to all created resources. Comma separated list, e.g. myTag=myvalue,myTag2=myValue2
     type: string
+  AZURE_SYSTEM_ASSIGNED_IDENTITY:
+    description: |-
+      If "true", attach a system-assigned managed identity to the VM at creation
+      time. Lets workloads inside the VM authenticate to Azure resources (Key
+      Vault, Storage, etc.) via the Instance Metadata Service without storing
+      credentials. Role assignments against specific resources remain the
+      operator's responsibility.
+    default: "false"
+    type: boolean
   INACTIVITY_TIMEOUT:
     description: If defined, will automatically stop the VM after the inactivity period.
     default: 10m
