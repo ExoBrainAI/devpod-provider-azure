@@ -5,6 +5,12 @@ description: |-
 icon: https://devpod.sh/assets/azure.svg
 optionGroups:
   - options:
+      - AZURE_TENANT_ID
+      - AZURE_CLIENT_ID
+      - AZURE_CLIENT_SECRET
+    name: "Service principal authentication (optional)"
+    defaultVisible: false
+  - options:
       - AZURE_DISK_SIZE
       - AZURE_DISK_TYPE
       - AZURE_IMAGE
@@ -29,6 +35,22 @@ options:
     description: The azure subscription id
     required: true
     command: az account show --query id --output tsv || true
+  AZURE_TENANT_ID:
+    description: |-
+      Azure AD tenant id. Required when authenticating as a service principal
+      (set together with AZURE_CLIENT_ID and AZURE_CLIENT_SECRET); ignored
+      when DevPod is using your local az login cache.
+    required: false
+  AZURE_CLIENT_ID:
+    description: |-
+      Service principal client (application) id. Set together with
+      AZURE_CLIENT_SECRET and AZURE_TENANT_ID for non-interactive auth that
+      doesn't depend on a per-user az login.
+    required: false
+  AZURE_CLIENT_SECRET:
+    description: Service principal client secret matching AZURE_CLIENT_ID.
+    required: false
+    password: true
   AZURE_RESOURCE_GROUP:
     description: The azure resource group name
     required: true
