@@ -21,6 +21,7 @@ var (
 	AZURE_SUBSCRIPTION_ID           = "AZURE_SUBSCRIPTION_ID"
 	AZURE_TAGS                      = "AZURE_TAGS"
 	AZURE_SYSTEM_ASSIGNED_IDENTITY  = "AZURE_SYSTEM_ASSIGNED_IDENTITY"
+	AZURE_USER_ASSIGNED_IDENTITY_ID = "AZURE_USER_ASSIGNED_IDENTITY_ID"
 )
 
 type Options struct {
@@ -36,6 +37,7 @@ type Options struct {
 	Zone                   string
 	Tags                   map[string]*string
 	SystemAssignedIdentity bool
+	UserAssignedIdentityID string
 }
 
 type AzureImage struct {
@@ -116,6 +118,13 @@ func FromEnv(init bool) (*Options, error) {
 		os.Getenv(AZURE_SYSTEM_ASSIGNED_IDENTITY),
 		"true",
 	)
+
+	// Optional. When set, attach the user-assigned managed identity at the
+	// given resource ID to the VM. This pattern lets an admin pre-grant a
+	// single shared identity (e.g. Key Vault Secrets User) once, and every
+	// VM provisioned by this provider gets that identity — no per-VM role
+	// assignment needed.
+	retOptions.UserAssignedIdentityID = os.Getenv(AZURE_USER_ASSIGNED_IDENTITY_ID)
 
 	// Return eraly if we're just doing init
 	if init {

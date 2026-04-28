@@ -294,7 +294,19 @@ func createVirtualMachine(
 	}
 
 	identityType := armcompute.ResourceIdentityTypeNone
-	if azureProvider.Config.SystemAssignedIdentity {
+	var userAssignedIdentities map[string]*armcompute.UserAssignedIdentitiesValue
+	switch {
+	case azureProvider.Config.SystemAssignedIdentity && azureProvider.Config.UserAssignedIdentityID != "":
+		identityType = armcompute.ResourceIdentityTypeSystemAssignedUserAssigned
+		userAssignedIdentities = map[string]*armcompute.UserAssignedIdentitiesValue{
+			azureProvider.Config.UserAssignedIdentityID: {},
+		}
+	case azureProvider.Config.UserAssignedIdentityID != "":
+		identityType = armcompute.ResourceIdentityTypeUserAssigned
+		userAssignedIdentities = map[string]*armcompute.UserAssignedIdentitiesValue{
+			azureProvider.Config.UserAssignedIdentityID: {},
+		}
+	case azureProvider.Config.SystemAssignedIdentity:
 		identityType = armcompute.ResourceIdentityTypeSystemAssigned
 	}
 
@@ -302,7 +314,8 @@ func createVirtualMachine(
 		Location: to.Ptr(azureProvider.Config.Zone),
 		Tags:     azureProvider.Config.Tags,
 		Identity: &armcompute.VirtualMachineIdentity{
-			Type: to.Ptr(identityType),
+			Type:                   to.Ptr(identityType),
+			UserAssignedIdentities: userAssignedIdentities,
 		},
 		Properties: &armcompute.VirtualMachineProperties{
 			StorageProfile: &armcompute.StorageProfile{
