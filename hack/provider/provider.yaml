@@ -21,6 +21,7 @@ optionGroups:
   - options:
       - AZURE_CUSTOM_DATA
       - AZURE_SYSTEM_ASSIGNED_IDENTITY
+      - AZURE_USER_ASSIGNED_IDENTITY_ID
     name: "Advanced options"
     defaultVisible: false
 options:
@@ -148,10 +149,19 @@ options:
       If "true", attach a system-assigned managed identity to the VM at creation
       time. Lets workloads inside the VM authenticate to Azure resources (Key
       Vault, Storage, etc.) via the Instance Metadata Service without storing
-      credentials. Role assignments against specific resources remain the
-      operator's responsibility.
+      credentials. Role assignments against the per-VM principalId remain the
+      operator's responsibility — for shared/team setups prefer
+      AZURE_USER_ASSIGNED_IDENTITY_ID instead.
     default: "false"
     type: boolean
+  AZURE_USER_ASSIGNED_IDENTITY_ID:
+    description: |-
+      Resource ID of a user-assigned managed identity to attach to the VM.
+      Pre-grant the identity its needed roles (e.g. Key Vault Secrets User)
+      once, and every VM provisioned by this provider inherits that access —
+      no per-VM role assignment needed. Format:
+      /subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/<name>
+    type: string
   INACTIVITY_TIMEOUT:
     description: If defined, will automatically stop the VM after the inactivity period.
     default: 10m
